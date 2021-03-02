@@ -1,35 +1,28 @@
 package bls;
 
-import bls.util.LibraryLoader;
-import bls.util.LibraryLoader.OperatingSystem;
 import com.herumi.mcl.Fp;
 import com.herumi.mcl.Fr;
 import com.herumi.mcl.G2;
 import com.herumi.mcl.Mcl;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.scijava.nativelib.NativeLoader;
 
 public enum BlsBn254 implements Bls {
     INSTANCE;
 
     private final AtomicBoolean nativeLibsLoaded = new AtomicBoolean(false);
 
-    public static void init(){
+    public static void init() {
         if (!INSTANCE.nativeLibsLoaded.getAndSet(true)) {
             try {
-                new LibraryLoader().loadNativeLibrary("mcljava");
+                NativeLoader.loadLibrary("mcljava");
                 Mcl.SystemInit(Mcl.BN254);
-            } catch(Exception e){
+            } catch (Exception e) {
                 INSTANCE.nativeLibsLoaded.set(false);
-                throw new IllegalStateException("Library could not be loaded automatically, try loading manually by calling BlsBn254.INSTANCE.init(osType) before generating keys", e);
+                throw new IllegalStateException(
+                    "Library could not be loaded automatically, try loading manually by calling BlsBn254.INSTANCE.init(osType) before generating keys",
+                    e);
             }
-        }
-    }
-
-    public static void init(OperatingSystem operatingSystem){
-        if(!INSTANCE.nativeLibsLoaded.get()) {
-            new LibraryLoader().loadNativeLibrary("mcljava", operatingSystem);
-            Mcl.SystemInit(Mcl.BN254);
-            INSTANCE.nativeLibsLoaded.set(true);
         }
     }
 
