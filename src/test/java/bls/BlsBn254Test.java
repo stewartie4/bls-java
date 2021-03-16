@@ -2,7 +2,7 @@ package bls;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-
+import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +13,9 @@ public class BlsBn254Test {
     private byte[] exampleSeed;
     private byte[] expectedSecretKeyBytes;
     private byte[] expectedPublicKeyBytes;
+    private byte[] expectedSignatureBytes;
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -63,6 +65,17 @@ public class BlsBn254Test {
             -46, -65, -23, -53,
             -23, 127, -120
         };
+
+        expectedSignatureBytes = new byte[]{
+            124, -80, -64, -71,
+            95, 86, -55, 100,
+            -65, -124, -86, -1,
+            -86, -22, 77, -97,
+            -118, -33, -12, 77,
+            18, 39, -126, 8,
+            -103, -3, -102, 75,
+            65, -45, -74, 28
+        };
     }
 
     @Test
@@ -80,6 +93,15 @@ public class BlsBn254Test {
 
         assertEquals("36eb0e60d74c0b2b00697e4fbc1223ed29daf5dc215952fa4edf4f3f400e2c02121872e7b8f65cfa48c0077e40fb85a7f77c6b7a3858aa17f6d2bfe9cbe97f88", publicKey.getHexString());
         assertArrayEquals(expectedPublicKeyBytes, publicKey.getBytes());
+    }
+
+    @Test
+    public void shouldCorrectlySignUsingPrivateKey(){
+        SecretKey secretKey = classUnderTest.getSecretKey(exampleSeed);
+        Signature signature = classUnderTest.sign("signMe".getBytes(StandardCharsets.UTF_8), secretKey);
+
+        assertEquals("7cb0c0b95f56c964bf84aaffaaea4d9f8adff44d1227820899fd9a4b41d3b61c", signature.getHexString());
+        assertArrayEquals(expectedSignatureBytes, signature.getBytes());
     }
 
     @Test
@@ -104,5 +126,29 @@ public class BlsBn254Test {
         expectedException.expectMessage("SecretKey must not be null");
 
         classUnderTest.getPublicKey(null);
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenSecretKeyNullWhenSigning(){
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("SecretKey must not be null");
+
+        classUnderTest.sign("hello".getBytes(), null);
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenSeedNullWhenSigning(){
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Message to sign must not be null or empty");
+
+        classUnderTest.sign(null, new SecretKey(null));
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenSeedEmptyWhenSigning(){
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Message to sign must not be null or empty");
+
+        classUnderTest.sign(new byte[0], new SecretKey(null));
     }
 }

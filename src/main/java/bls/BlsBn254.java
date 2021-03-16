@@ -2,6 +2,7 @@ package bls;
 
 import com.herumi.mcl.Fp;
 import com.herumi.mcl.Fr;
+import com.herumi.mcl.G1;
 import com.herumi.mcl.G2;
 import com.herumi.mcl.Mcl;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,9 +20,7 @@ public enum BlsBn254 implements Bls {
                 Mcl.SystemInit(Mcl.BN254);
             } catch (Exception e) {
                 INSTANCE.nativeLibsLoaded.set(false);
-                throw new IllegalStateException(
-                    "Library could not be loaded automatically, try loading manually by calling BlsBn254.INSTANCE.init(osType) before generating keys",
-                    e);
+                throw new IllegalStateException("Library could not be loaded automatically, try loading manually by calling BlsBn254.INSTANCE.init(osType) before generating keys", e);
             }
         }
     }
@@ -48,6 +47,22 @@ public enum BlsBn254 implements Bls {
         Mcl.mul(pub, getBn254PublicKeyBase(), toFr(secretKey));
 
         return new PublicKey(pub);
+    }
+
+    @Override
+    public Signature sign(byte[] message, SecretKey secretKey) {
+        init();
+        if(message == null || message.length == 0){
+            throw new IllegalArgumentException("Message to sign must not be null or empty");
+        }
+        if(secretKey == null){
+            throw new IllegalArgumentException("SecretKey must not be null");
+        }
+        G1 sig = new G1();
+        Mcl.hashAndMapToG1(sig, message);
+        Mcl.mul(sig, sig, secretKey.getUnderlyingImpl());
+
+        return new Signature(sig);
     }
 
     private Fr toFr(SecretKey secretKey) {

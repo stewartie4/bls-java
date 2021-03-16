@@ -1,6 +1,6 @@
 package com.herumi.mcl;
 
-public class G1 {
+public class G1 implements ByteProvider {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
@@ -13,7 +13,6 @@ public class G1 {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
   protected void finalize() {
     delete();
   }
