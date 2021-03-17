@@ -44,7 +44,7 @@ public enum BlsBn254 implements Bls {
             throw new IllegalArgumentException("SecretKey must not be null");
         }
         G2 pub = new G2();
-        Mcl.mul(pub, getBn254PublicKeyBase(), toFr(secretKey));
+        Mcl.mul(pub, getBn254PublicKeyBase(), secretKey.getUnderlyingImpl());
 
         return new PublicKey(pub);
     }
@@ -63,10 +63,6 @@ public enum BlsBn254 implements Bls {
         Mcl.mul(sig, sig, secretKey.getUnderlyingImpl());
 
         return new Signature(sig);
-    }
-
-    private Fr toFr(SecretKey secretKey) {
-        return secretKey.getUnderlyingImpl();
     }
 
     private static G2 getBn254PublicKeyBase() {
