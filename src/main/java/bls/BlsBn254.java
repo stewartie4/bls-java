@@ -20,7 +20,7 @@ public enum BlsBn254 implements Bls {
                 Mcl.SystemInit(Mcl.BN254);
             } catch (Exception e) {
                 INSTANCE.nativeLibsLoaded.set(false);
-                throw new IllegalStateException("Library could not be loaded automatically, try loading manually by calling BlsBn254.INSTANCE.init(osType) before generating keys", e);
+                throw new IllegalStateException("Library could not be loaded automatically Try loading manually by calling BlsBn254.INSTANCE.init() before generating keys", e);
             }
         }
     }
