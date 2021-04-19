@@ -13,7 +13,7 @@ public enum BlsBn254 implements Bls {
 
     private final AtomicBoolean nativeLibsLoaded = new AtomicBoolean(false);
 
-    public static void init() {
+    public static synchronized void init() {
         if (!INSTANCE.nativeLibsLoaded.getAndSet(true)) {
             try {
                 NativeLoader.loadLibrary("mcljava");
