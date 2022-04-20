@@ -4,4 +4,5 @@ Native libraries/JNI modified to support custom seed, pre-compiled for Mac/Win/L
 Supports Java 8 and up.  
 
 Build:  
-mvn clean install
+mvn clean install 
+ 
